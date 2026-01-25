@@ -1,0 +1,2936 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4",
+      "authorship_tag": "ABX9TyPhGf+GF32yl7VZur1SKurE",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/pradeep14012004/AI-DRIVEN-CYBER-THREAT-PREDICTION-SYSTEM/blob/main/ai\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 73
+        },
+        "id": "7plOuuy7kDDg",
+        "outputId": "5be75a05-d6e7-4b03-8c52-0f0572235c12"
+      },
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "<IPython.core.display.HTML object>"
+            ],
+            "text/html": [
+              "\n",
+              "     <input type=\"file\" id=\"files-7bce7aae-c51b-4ffe-a2b4-ac6e5d17b591\" name=\"files[]\" multiple disabled\n",
+              "        style=\"border:none\" />\n",
+              "     <output id=\"result-7bce7aae-c51b-4ffe-a2b4-ac6e5d17b591\">\n",
+              "      Upload widget is only available when the cell has been executed in the\n",
+              "      current browser session. Please rerun this cell to enable.\n",
+              "      </output>\n",
+              "      <script>// Copyright 2017 Google LLC\n",
+              "//\n",
+              "// Licensed under the Apache License, Version 2.0 (the \"License\");\n",
+              "// you may not use this file except in compliance with the License.\n",
+              "// You may obtain a copy of the License at\n",
+              "//\n",
+              "//      http://www.apache.org/licenses/LICENSE-2.0\n",
+              "//\n",
+              "// Unless required by applicable law or agreed to in writing, software\n",
+              "// distributed under the License is distributed on an \"AS IS\" BASIS,\n",
+              "// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n",
+              "// See the License for the specific language governing permissions and\n",
+              "// limitations under the License.\n",
+              "\n",
+              "/**\n",
+              " * @fileoverview Helpers for google.colab Python module.\n",
+              " */\n",
+              "(function(scope) {\n",
+              "function span(text, styleAttributes = {}) {\n",
+              "  const element = document.createElement('span');\n",
+              "  element.textContent = text;\n",
+              "  for (const key of Object.keys(styleAttributes)) {\n",
+              "    element.style[key] = styleAttributes[key];\n",
+              "  }\n",
+              "  return element;\n",
+              "}\n",
+              "\n",
+              "// Max number of bytes which will be uploaded at a time.\n",
+              "const MAX_PAYLOAD_SIZE = 100 * 1024;\n",
+              "\n",
+              "function _uploadFiles(inputId, outputId) {\n",
+              "  const steps = uploadFilesStep(inputId, outputId);\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  // Cache steps on the outputElement to make it available for the next call\n",
+              "  // to uploadFilesContinue from Python.\n",
+              "  outputElement.steps = steps;\n",
+              "\n",
+              "  return _uploadFilesContinue(outputId);\n",
+              "}\n",
+              "\n",
+              "// This is roughly an async generator (not supported in the browser yet),\n",
+              "// where there are multiple asynchronous steps and the Python side is going\n",
+              "// to poll for completion of each step.\n",
+              "// This uses a Promise to block the python side on completion of each step,\n",
+              "// then passes the result of the previous step as the input to the next step.\n",
+              "function _uploadFilesContinue(outputId) {\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  const steps = outputElement.steps;\n",
+              "\n",
+              "  const next = steps.next(outputElement.lastPromiseValue);\n",
+              "  return Promise.resolve(next.value.promise).then((value) => {\n",
+              "    // Cache the last promise value to make it available to the next\n",
+              "    // step of the generator.\n",
+              "    outputElement.lastPromiseValue = value;\n",
+              "    return next.value.response;\n",
+              "  });\n",
+              "}\n",
+              "\n",
+              "/**\n",
+              " * Generator function which is called between each async step of the upload\n",
+              " * process.\n",
+              " * @param {string} inputId Element ID of the input file picker element.\n",
+              " * @param {string} outputId Element ID of the output display.\n",
+              " * @return {!Iterable<!Object>} Iterable of next steps.\n",
+              " */\n",
+              "function* uploadFilesStep(inputId, outputId) {\n",
+              "  const inputElement = document.getElementById(inputId);\n",
+              "  inputElement.disabled = false;\n",
+              "\n",
+              "  const outputElement = document.getElementById(outputId);\n",
+              "  outputElement.innerHTML = '';\n",
+              "\n",
+              "  const pickedPromise = new Promise((resolve) => {\n",
+              "    inputElement.addEventListener('change', (e) => {\n",
+              "      resolve(e.target.files);\n",
+              "    });\n",
+              "  });\n",
+              "\n",
+              "  const cancel = document.createElement('button');\n",
+              "  inputElement.parentElement.appendChild(cancel);\n",
+              "  cancel.textContent = 'Cancel upload';\n",
+              "  const cancelPromise = new Promise((resolve) => {\n",
+              "    cancel.onclick = () => {\n",
+              "      resolve(null);\n",
+              "    };\n",
+              "  });\n",
+              "\n",
+              "  // Wait for the user to pick the files.\n",
+              "  const files = yield {\n",
+              "    promise: Promise.race([pickedPromise, cancelPromise]),\n",
+              "    response: {\n",
+              "      action: 'starting',\n",
+              "    }\n",
+              "  };\n",
+              "\n",
+              "  cancel.remove();\n",
+              "\n",
+              "  // Disable the input element since further picks are not allowed.\n",
+              "  inputElement.disabled = true;\n",
+              "\n",
+              "  if (!files) {\n",
+              "    return {\n",
+              "      response: {\n",
+              "        action: 'complete',\n",
+              "      }\n",
+              "    };\n",
+              "  }\n",
+              "\n",
+              "  for (const file of files) {\n",
+              "    const li = document.createElement('li');\n",
+              "    li.append(span(file.name, {fontWeight: 'bold'}));\n",
+              "    li.append(span(\n",
+              "        `(${file.type || 'n/a'}) - ${file.size} bytes, ` +\n",
+              "        `last modified: ${\n",
+              "            file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() :\n",
+              "                                    'n/a'} - `));\n",
+              "    const percent = span('0% done');\n",
+              "    li.appendChild(percent);\n",
+              "\n",
+              "    outputElement.appendChild(li);\n",
+              "\n",
+              "    const fileDataPromise = new Promise((resolve) => {\n",
+              "      const reader = new FileReader();\n",
+              "      reader.onload = (e) => {\n",
+              "        resolve(e.target.result);\n",
+              "      };\n",
+              "      reader.readAsArrayBuffer(file);\n",
+              "    });\n",
+              "    // Wait for the data to be ready.\n",
+              "    let fileData = yield {\n",
+              "      promise: fileDataPromise,\n",
+              "      response: {\n",
+              "        action: 'continue',\n",
+              "      }\n",
+              "    };\n",
+              "\n",
+              "    // Use a chunked sending to avoid message size limits. See b/62115660.\n",
+              "    let position = 0;\n",
+              "    do {\n",
+              "      const length = Math.min(fileData.byteLength - position, MAX_PAYLOAD_SIZE);\n",
+              "      const chunk = new Uint8Array(fileData, position, length);\n",
+              "      position += length;\n",
+              "\n",
+              "      const base64 = btoa(String.fromCharCode.apply(null, chunk));\n",
+              "      yield {\n",
+              "        response: {\n",
+              "          action: 'append',\n",
+              "          file: file.name,\n",
+              "          data: base64,\n",
+              "        },\n",
+              "      };\n",
+              "\n",
+              "      let percentDone = fileData.byteLength === 0 ?\n",
+              "          100 :\n",
+              "          Math.round((position / fileData.byteLength) * 100);\n",
+              "      percent.textContent = `${percentDone}% done`;\n",
+              "\n",
+              "    } while (position < fileData.byteLength);\n",
+              "  }\n",
+              "\n",
+              "  // All done.\n",
+              "  yield {\n",
+              "    response: {\n",
+              "      action: 'complete',\n",
+              "    }\n",
+              "  };\n",
+              "}\n",
+              "\n",
+              "scope.google = scope.google || {};\n",
+              "scope.google.colab = scope.google.colab || {};\n",
+              "scope.google.colab._files = {\n",
+              "  _uploadFiles,\n",
+              "  _uploadFilesContinue,\n",
+              "};\n",
+              "})(self);\n",
+              "</script> "
+            ]
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Saving cybersecurity-threat-ai-main.zip to cybersecurity-threat-ai-main.zip\n"
+          ]
+        }
+      ],
+      "source": [
+        "from google.colab import files\n",
+        "uploaded = files.upload()\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!unzip cybersecurity-threat-ai-main.zip\n",
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yNx2hG5Fkh-9",
+        "outputId": "02683193-d921-4c28-8aef-0178ecaaf0ba"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Archive:  cybersecurity-threat-ai-main.zip\n",
+            "b5a8874f293e454fe11eabd135c898ac54755a67\n",
+            "   creating: cybersecurity-threat-ai-main/\n",
+            "  inflating: cybersecurity-threat-ai-main/.gitattributes  \n",
+            " extracting: cybersecurity-threat-ai-main/.gitignore  \n",
+            "   creating: cybersecurity-threat-ai-main/.ipynb_checkpoints/\n",
+            "  inflating: cybersecurity-threat-ai-main/.ipynb_checkpoints/Preprocessing-checkpoint.ipynb  \n",
+            "  inflating: cybersecurity-threat-ai-main/.ipynb_checkpoints/README-checkpoint.md  \n",
+            " extracting: cybersecurity-threat-ai-main/LICENSE  \n",
+            "  inflating: cybersecurity-threat-ai-main/README.md  \n",
+            "   creating: cybersecurity-threat-ai-main/data/\n",
+            "  inflating: cybersecurity-threat-ai-main/data/.gitkeep  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTest+.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTest+.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTest-21.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTest-21.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTest1.jpg  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain+.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain+.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain+Multi.csv  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain+_20Percent.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain+_20Percent.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/KDDTrain1.jpg  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/index.html  \n",
+            "   creating: cybersecurity-threat-ai-main/data/nsl-kdd/\n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTest+.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTest+.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTest-21.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTest-21.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTest1.jpg  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTrain+.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTrain+.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTrain+_20Percent.arff  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTrain+_20Percent.txt  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/KDDTrain1.jpg  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/nsl-kdd/index.html  \n",
+            "  inflating: cybersecurity-threat-ai-main/data/security_logs.csv  \n",
+            "   creating: cybersecurity-threat-ai-main/models/\n",
+            "  inflating: cybersecurity-threat-ai-main/models/.gitkeep  \n",
+            "  inflating: cybersecurity-threat-ai-main/models/threat_detector_rf.pkl  \n",
+            "   creating: cybersecurity-threat-ai-main/notebooks/\n",
+            "  inflating: cybersecurity-threat-ai-main/notebooks/Preprocessing.ipynb  \n",
+            "  inflating: cybersecurity-threat-ai-main/requirements.txt  \n",
+            "   creating: cybersecurity-threat-ai-main/src/\n",
+            "  inflating: cybersecurity-threat-ai-main/src/deploy.py  \n",
+            "  inflating: cybersecurity-threat-ai-main/src/predict.py  \n",
+            "  inflating: cybersecurity-threat-ai-main/src/preprocess.py  \n",
+            "  inflating: cybersecurity-threat-ai-main/src/train.py  \n",
+            "cybersecurity-threat-ai-main  cybersecurity-threat-ai-main.zip\tsample_data\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%cd cybersecurity-threat-ai-main\n",
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "1RWT49sokm7R",
+        "outputId": "99015cf1-6adb-4062-d3b6-c88c5fada1df"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/cybersecurity-threat-ai-main\n",
+            "data  LICENSE  models  notebooks  README.md  requirements.txt  src\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install numpy pandas scikit-learn matplotlib seaborn scapy\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qBdKHiDnkq5I",
+        "outputId": "b886a89b-2451-4af1-e4ef-f5481030b8ec"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (2.0.2)\n",
+            "Requirement already satisfied: pandas in /usr/local/lib/python3.12/dist-packages (2.2.2)\n",
+            "Requirement already satisfied: scikit-learn in /usr/local/lib/python3.12/dist-packages (1.6.1)\n",
+            "Requirement already satisfied: matplotlib in /usr/local/lib/python3.12/dist-packages (3.10.0)\n",
+            "Requirement already satisfied: seaborn in /usr/local/lib/python3.12/dist-packages (0.13.2)\n",
+            "Collecting scapy\n",
+            "  Downloading scapy-2.7.0-py3-none-any.whl.metadata (5.8 kB)\n",
+            "Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas) (2.9.0.post0)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.12/dist-packages (from pandas) (2025.2)\n",
+            "Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.12/dist-packages (from pandas) (2025.3)\n",
+            "Requirement already satisfied: scipy>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (1.16.3)\n",
+            "Requirement already satisfied: joblib>=1.2.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (1.5.3)\n",
+            "Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn) (3.6.0)\n",
+            "Requirement already satisfied: contourpy>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (1.3.3)\n",
+            "Requirement already satisfied: cycler>=0.10 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (0.12.1)\n",
+            "Requirement already satisfied: fonttools>=4.22.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (4.61.1)\n",
+            "Requirement already satisfied: kiwisolver>=1.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (1.4.9)\n",
+            "Requirement already satisfied: packaging>=20.0 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (25.0)\n",
+            "Requirement already satisfied: pillow>=8 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (11.3.0)\n",
+            "Requirement already satisfied: pyparsing>=2.3.1 in /usr/local/lib/python3.12/dist-packages (from matplotlib) (3.3.1)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)\n",
+            "Downloading scapy-2.7.0-py3-none-any.whl (2.6 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.6/2.6 MB\u001b[0m \u001b[31m41.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: scapy\n",
+            "Successfully installed scapy-2.7.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "D0rPqJJmkvlT",
+        "outputId": "969f7e0f-d200-4eab-caec-94c18b7673f6"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "data  LICENSE  models  notebooks  README.md  requirements.txt  src\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install -r requirements.txt\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 1000
+        },
+        "id": "9_BQpoWelCJ5",
+        "outputId": "450a02a1-9395-4049-b659-fe7d855c90ba"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: blinker==1.9.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 1)) (1.9.0)\n",
+            "Collecting click==8.1.8 (from -r requirements.txt (line 2))\n",
+            "  Downloading click-8.1.8-py3-none-any.whl.metadata (2.3 kB)\n",
+            "Collecting colorama==0.4.6 (from -r requirements.txt (line 3))\n",
+            "  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)\n",
+            "Collecting Flask==3.1.0 (from -r requirements.txt (line 4))\n",
+            "  Downloading flask-3.1.0-py3-none-any.whl.metadata (2.7 kB)\n",
+            "Requirement already satisfied: itsdangerous==2.2.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 5)) (2.2.0)\n",
+            "Requirement already satisfied: Jinja2==3.1.6 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 6)) (3.1.6)\n",
+            "Collecting joblib==1.4.2 (from -r requirements.txt (line 7))\n",
+            "  Downloading joblib-1.4.2-py3-none-any.whl.metadata (5.4 kB)\n",
+            "Collecting MarkupSafe==3.0.2 (from -r requirements.txt (line 8))\n",
+            "  Downloading MarkupSafe-3.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.0 kB)\n",
+            "Collecting numpy==2.2.4 (from -r requirements.txt (line 9))\n",
+            "  Downloading numpy-2.2.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (62 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m62.0/62.0 kB\u001b[0m \u001b[31m3.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting pandas==2.2.3 (from -r requirements.txt (line 10))\n",
+            "  Downloading pandas-2.2.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (89 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m89.9/89.9 kB\u001b[0m \u001b[31m6.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: python-dateutil==2.9.0.post0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 11)) (2.9.0.post0)\n",
+            "Collecting pytz==2025.1 (from -r requirements.txt (line 12))\n",
+            "  Downloading pytz-2025.1-py2.py3-none-any.whl.metadata (22 kB)\n",
+            "Requirement already satisfied: scikit-learn==1.6.1 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 13)) (1.6.1)\n",
+            "Collecting scipy==1.15.2 (from -r requirements.txt (line 14))\n",
+            "  Downloading scipy-1.15.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (61 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m62.0/62.0 kB\u001b[0m \u001b[31m5.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: six==1.17.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 15)) (1.17.0)\n",
+            "Requirement already satisfied: threadpoolctl==3.6.0 in /usr/local/lib/python3.12/dist-packages (from -r requirements.txt (line 16)) (3.6.0)\n",
+            "Collecting tzdata==2025.1 (from -r requirements.txt (line 17))\n",
+            "  Downloading tzdata-2025.1-py2.py3-none-any.whl.metadata (1.4 kB)\n",
+            "Collecting Werkzeug==3.1.3 (from -r requirements.txt (line 18))\n",
+            "  Downloading werkzeug-3.1.3-py3-none-any.whl.metadata (3.7 kB)\n",
+            "Downloading click-8.1.8-py3-none-any.whl (98 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m98.2/98.2 kB\u001b[0m \u001b[31m6.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)\n",
+            "Downloading flask-3.1.0-py3-none-any.whl (102 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m103.0/103.0 kB\u001b[0m \u001b[31m11.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading joblib-1.4.2-py3-none-any.whl (301 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m301.8/301.8 kB\u001b[0m \u001b[31m25.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading MarkupSafe-3.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (23 kB)\n",
+            "Downloading numpy-2.2.4-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.1 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m16.1/16.1 MB\u001b[0m \u001b[31m56.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pandas-2.2.3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.7 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m12.7/12.7 MB\u001b[0m \u001b[31m112.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pytz-2025.1-py2.py3-none-any.whl (507 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m507.9/507.9 kB\u001b[0m \u001b[31m30.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading scipy-1.15.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (37.3 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m37.3/37.3 MB\u001b[0m \u001b[31m13.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading tzdata-2025.1-py2.py3-none-any.whl (346 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m346.8/346.8 kB\u001b[0m \u001b[31m33.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading werkzeug-3.1.3-py3-none-any.whl (224 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m224.5/224.5 kB\u001b[0m \u001b[31m24.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: pytz, tzdata, numpy, MarkupSafe, joblib, colorama, click, Werkzeug, scipy, pandas, Flask\n",
+            "  Attempting uninstall: pytz\n",
+            "    Found existing installation: pytz 2025.2\n",
+            "    Uninstalling pytz-2025.2:\n",
+            "      Successfully uninstalled pytz-2025.2\n",
+            "  Attempting uninstall: tzdata\n",
+            "    Found existing installation: tzdata 2025.3\n",
+            "    Uninstalling tzdata-2025.3:\n",
+            "      Successfully uninstalled tzdata-2025.3\n",
+            "  Attempting uninstall: numpy\n",
+            "    Found existing installation: numpy 2.0.2\n",
+            "    Uninstalling numpy-2.0.2:\n",
+            "      Successfully uninstalled numpy-2.0.2\n",
+            "  Attempting uninstall: MarkupSafe\n",
+            "    Found existing installation: MarkupSafe 3.0.3\n",
+            "    Uninstalling MarkupSafe-3.0.3:\n",
+            "      Successfully uninstalled MarkupSafe-3.0.3\n",
+            "  Attempting uninstall: joblib\n",
+            "    Found existing installation: joblib 1.5.3\n",
+            "    Uninstalling joblib-1.5.3:\n",
+            "      Successfully uninstalled joblib-1.5.3\n",
+            "  Attempting uninstall: click\n",
+            "    Found existing installation: click 8.3.1\n",
+            "    Uninstalling click-8.3.1:\n",
+            "      Successfully uninstalled click-8.3.1\n",
+            "  Attempting uninstall: Werkzeug\n",
+            "    Found existing installation: Werkzeug 3.1.5\n",
+            "    Uninstalling Werkzeug-3.1.5:\n",
+            "      Successfully uninstalled Werkzeug-3.1.5\n",
+            "  Attempting uninstall: scipy\n",
+            "    Found existing installation: scipy 1.16.3\n",
+            "    Uninstalling scipy-1.16.3:\n",
+            "      Successfully uninstalled scipy-1.16.3\n",
+            "  Attempting uninstall: pandas\n",
+            "    Found existing installation: pandas 2.2.2\n",
+            "    Uninstalling pandas-2.2.2:\n",
+            "      Successfully uninstalled pandas-2.2.2\n",
+            "  Attempting uninstall: Flask\n",
+            "    Found existing installation: Flask 3.1.2\n",
+            "    Uninstalling Flask-3.1.2:\n",
+            "      Successfully uninstalled Flask-3.1.2\n",
+            "\u001b[31mERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n",
+            "google-colab 1.0.0 requires pandas==2.2.2, but you have pandas 2.2.3 which is incompatible.\n",
+            "tensorflow 2.19.0 requires numpy<2.2.0,>=1.26.0, but you have numpy 2.2.4 which is incompatible.\n",
+            "numba 0.60.0 requires numpy<2.1,>=1.22, but you have numpy 2.2.4 which is incompatible.\u001b[0m\u001b[31m\n",
+            "\u001b[0mSuccessfully installed Flask-3.1.0 MarkupSafe-3.0.2 Werkzeug-3.1.3 click-8.1.8 colorama-0.4.6 joblib-1.4.2 numpy-2.2.4 pandas-2.2.3 pytz-2025.1 scipy-1.15.2 tzdata-2025.1\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "application/vnd.colab-display-data+json": {
+              "pip_warning": {
+                "packages": [
+                  "numpy"
+                ]
+              },
+              "id": "9603aa085e1e423fbb1906a792791c56"
+            }
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install numpy==2.0.2 pandas==2.2.2\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 532
+        },
+        "id": "7PQEHMB7lU7f",
+        "outputId": "f3d47a26-cac6-44ed-b273-57f2f5c11804"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting numpy==2.0.2\n",
+            "  Downloading numpy-2.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m60.9/60.9 kB\u001b[0m \u001b[31m3.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hCollecting pandas==2.2.2\n",
+            "  Downloading pandas-2.2.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)\n",
+            "Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.12/dist-packages (from pandas==2.2.2) (2.9.0.post0)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.12/dist-packages (from pandas==2.2.2) (2025.1)\n",
+            "Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.12/dist-packages (from pandas==2.2.2) (2025.1)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.12/dist-packages (from python-dateutil>=2.8.2->pandas==2.2.2) (1.17.0)\n",
+            "Downloading numpy-2.0.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (19.2 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m19.2/19.2 MB\u001b[0m \u001b[31m91.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading pandas-2.2.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.7 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m12.7/12.7 MB\u001b[0m \u001b[31m99.0 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hInstalling collected packages: numpy, pandas\n",
+            "  Attempting uninstall: numpy\n",
+            "    Found existing installation: numpy 2.2.4\n",
+            "    Uninstalling numpy-2.2.4:\n",
+            "      Successfully uninstalled numpy-2.2.4\n",
+            "  Attempting uninstall: pandas\n",
+            "    Found existing installation: pandas 2.2.3\n",
+            "    Uninstalling pandas-2.2.3:\n",
+            "      Successfully uninstalled pandas-2.2.3\n",
+            "Successfully installed numpy-2.0.2 pandas-2.2.2\n"
+          ]
+        },
+        {
+          "output_type": "display_data",
+          "data": {
+            "application/vnd.colab-display-data+json": {
+              "pip_warning": {
+                "packages": [
+                  "numpy"
+                ]
+              },
+              "id": "4cd0731765b5447c89f820ac52fa7345"
+            }
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install Flask==3.1.0 scikit-learn==1.6.1 scipy==1.15.2 joblib==1.4.2 click==8.1.8 colorama==0.4.6\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZN6gQPQvlbAu",
+        "outputId": "d3006d5e-eaae-4cfd-efc8-11e320d4ab04"
+      },
+      "execution_count": 1,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: Flask==3.1.0 in /usr/local/lib/python3.12/dist-packages (3.1.0)\n",
+            "Requirement already satisfied: scikit-learn==1.6.1 in /usr/local/lib/python3.12/dist-packages (1.6.1)\n",
+            "Requirement already satisfied: scipy==1.15.2 in /usr/local/lib/python3.12/dist-packages (1.15.2)\n",
+            "Requirement already satisfied: joblib==1.4.2 in /usr/local/lib/python3.12/dist-packages (1.4.2)\n",
+            "Requirement already satisfied: click==8.1.8 in /usr/local/lib/python3.12/dist-packages (8.1.8)\n",
+            "Requirement already satisfied: colorama==0.4.6 in /usr/local/lib/python3.12/dist-packages (0.4.6)\n",
+            "Requirement already satisfied: Werkzeug>=3.1 in /usr/local/lib/python3.12/dist-packages (from Flask==3.1.0) (3.1.3)\n",
+            "Requirement already satisfied: Jinja2>=3.1.2 in /usr/local/lib/python3.12/dist-packages (from Flask==3.1.0) (3.1.6)\n",
+            "Requirement already satisfied: itsdangerous>=2.2 in /usr/local/lib/python3.12/dist-packages (from Flask==3.1.0) (2.2.0)\n",
+            "Requirement already satisfied: blinker>=1.9 in /usr/local/lib/python3.12/dist-packages (from Flask==3.1.0) (1.9.0)\n",
+            "Requirement already satisfied: numpy>=1.19.5 in /usr/local/lib/python3.12/dist-packages (from scikit-learn==1.6.1) (2.0.2)\n",
+            "Requirement already satisfied: threadpoolctl>=3.1.0 in /usr/local/lib/python3.12/dist-packages (from scikit-learn==1.6.1) (3.6.0)\n",
+            "Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.12/dist-packages (from Jinja2>=3.1.2->Flask==3.1.0) (3.0.2)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%cd src\n",
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sbIX4kxllfFt",
+        "outputId": "a8256dd9-145d-412a-8bc1-7516fb80cfca"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "[Errno 2] No such file or directory: 'src'\n",
+            "/content\n",
+            "cybersecurity-threat-ai-main  cybersecurity-threat-ai-main.zip\tsample_data\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%cd cybersecurity-threat-ai-main\n",
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "XBNiMLGPlsLA",
+        "outputId": "cdcc3fb8-a5f5-460a-9e70-3673eb6448f4"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/cybersecurity-threat-ai-main\n",
+            "data  LICENSE  models  notebooks  README.md  requirements.txt  src\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%cd src\n",
+        "!ls\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "S-gplqOzlv4t",
+        "outputId": "e3494454-0beb-4a4d-cd70-a64794a39886"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/content/cybersecurity-threat-ai-main/src\n",
+            "deploy.py  predict.py  preprocess.py  train.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ls data\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "mGPsPvN_l3X_",
+        "outputId": "16c15785-bd21-4a32-e53f-b79ddc214db3"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "index.html\t KDDTest+.txt\t\t   KDDTrain+Multi.csv\n",
+            "KDDTest1.jpg\t KDDTrain1.jpg\t\t   KDDTrain+.txt\n",
+            "KDDTest-21.arff  KDDTrain+_20Percent.arff  nsl-kdd\n",
+            "KDDTest-21.txt\t KDDTrain+_20Percent.txt   security_logs.csv\n",
+            "KDDTest+.arff\t KDDTrain+.arff\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -O data/KDDTrain+Multi.csv https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTrain+.csv\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8eDRwKl0muy1",
+        "outputId": "00510945-becc-409c-bed5-54aba10c7f83"
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2026-01-25 05:22:58--  https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTrain+.csv\n",
+            "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.111.133, 185.199.110.133, 185.199.109.133, ...\n",
+            "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.111.133|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 14612857 (14M) [text/plain]\n",
+            "Saving to: ‘data/KDDTrain+Multi.csv’\n",
+            "\n",
+            "data/KDDTrain+Multi 100%[===================>]  13.94M  --.-KB/s    in 0.09s   \n",
+            "\n",
+            "2026-01-25 05:22:58 (161 MB/s) - ‘data/KDDTrain+Multi.csv’ saved [14612857/14612857]\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\")\n",
+        "print(df.columns)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "FvGs4rrZmfrl",
+        "outputId": "39b14c2a-3e0e-44c4-9581-3304e59787dd"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Index(['0', 'tcp', 'ftp_data', 'SF', '491', '0.1', '0.2', '0.3', '0.4', '0.5',\n",
+            "       '0.6', '0.7', '0.8', '0.9', '0.10', '0.11', '0.12', '0.13', '0.14',\n",
+            "       '0.15', '0.16', '0.18', '2', '2.1', '0.19', '0.20', '0.21', '0.22', '1',\n",
+            "       '0.23', '0.24', '150', '25', '0.17', '0.03', '0.17.1', '0.25', '0.26',\n",
+            "       '0.27', '0.05', '0.28', 'normal', '20'],\n",
+            "      dtype='object')\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cols = [\n",
+        " 'duration','protocol_type','service','flag','src_bytes','dst_bytes','land',\n",
+        " 'wrong_fragment','urgent','hot','num_failed_logins','logged_in','num_compromised',\n",
+        " 'root_shell','su_attempted','num_root','num_file_creations','num_shells',\n",
+        " 'num_access_files','num_outbound_cmds','is_host_login','is_guest_login',\n",
+        " 'count','srv_count','serror_rate','srv_serror_rate','rerror_rate','srv_rerror_rate',\n",
+        " 'same_srv_rate','diff_srv_rate','srv_diff_host_rate','dst_host_count',\n",
+        " 'dst_host_srv_count','dst_host_same_srv_rate','dst_host_diff_srv_rate',\n",
+        " 'dst_host_same_src_port_rate','dst_host_srv_diff_host_rate','dst_host_serror_rate',\n",
+        " 'dst_host_srv_serror_rate','dst_host_rerror_rate','dst_host_srv_rerror_rate',\n",
+        " 'label','difficulty'\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "print(df.columns)\n",
+        "print(df[['label']].head())\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RrnCFUv_m-4v",
+        "outputId": "c044338a-033d-4302-8c12-18736b6fc1dc"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Index(['duration', 'protocol_type', 'service', 'flag', 'src_bytes',\n",
+            "       'dst_bytes', 'land', 'wrong_fragment', 'urgent', 'hot',\n",
+            "       'num_failed_logins', 'logged_in', 'num_compromised', 'root_shell',\n",
+            "       'su_attempted', 'num_root', 'num_file_creations', 'num_shells',\n",
+            "       'num_access_files', 'num_outbound_cmds', 'is_host_login',\n",
+            "       'is_guest_login', 'count', 'srv_count', 'serror_rate',\n",
+            "       'srv_serror_rate', 'rerror_rate', 'srv_rerror_rate', 'same_srv_rate',\n",
+            "       'diff_srv_rate', 'srv_diff_host_rate', 'dst_host_count',\n",
+            "       'dst_host_srv_count', 'dst_host_same_srv_rate',\n",
+            "       'dst_host_diff_srv_rate', 'dst_host_same_src_port_rate',\n",
+            "       'dst_host_srv_diff_host_rate', 'dst_host_serror_rate',\n",
+            "       'dst_host_srv_serror_rate', 'dst_host_rerror_rate',\n",
+            "       'dst_host_srv_rerror_rate', 'label', 'difficulty'],\n",
+            "      dtype='object')\n",
+            "     label\n",
+            "0   normal\n",
+            "1   normal\n",
+            "2  neptune\n",
+            "3   normal\n",
+            "4   normal\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's|data/your_dataset.csv|data/KDDTrain+Multi.csv|g' src/train.py\n",
+        "!sed -i 's/xAttack/label/g' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "zBZ8iZ3znAtb"
+      },
+      "execution_count": 13,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.preprocessing import LabelEncoder\n",
+        "\n",
+        "for col in ['protocol_type','service','flag']:\n",
+        "    le = LabelEncoder()\n",
+        "    df[col] = le.fit_transform(df[col])\n"
+      ],
+      "metadata": {
+        "id": "o1yaElUOnF-i"
+      },
+      "execution_count": 14,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "xtGN3vycnI06",
+        "outputId": "53f37737-a6b6-4de9-8885-61f5511a16e1"
+      },
+      "execution_count": 15,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Traceback (most recent call last):\n",
+            "  File \"/content/cybersecurity-threat-ai-main/src/train.py\", line 10, in <module>\n",
+            "    X = df.drop(\"label\", axis=1)\n",
+            "        ^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/frame.py\", line 5581, in drop\n",
+            "    return super().drop(\n",
+            "           ^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/generic.py\", line 4788, in drop\n",
+            "    obj = obj._drop_axis(labels, axis, level=level, errors=errors)\n",
+            "          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/generic.py\", line 4830, in _drop_axis\n",
+            "    new_axis = axis.drop(labels, errors=errors)\n",
+            "               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/indexes/base.py\", line 7070, in drop\n",
+            "    raise KeyError(f\"{labels[mask].tolist()} not found in axis\")\n",
+            "KeyError: \"['label'] not found in axis\"\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,50p' src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "zJDmXF1KnUHn",
+        "outputId": "c2c049bf-7bde-4a8a-9777-437d97ec3b60"
+      },
+      "execution_count": 16,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "from sklearn.model_selection import train_test_split\n",
+            "from sklearn.ensemble import RandomForestClassifier\n",
+            "import joblib\n",
+            "\n",
+            "# Load preprocessed data\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\")\n",
+            "\n",
+            "# Separate features and target\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "y = df[\"label\"]\n",
+            "\n",
+            "# Train-test split\n",
+            "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+            "\n",
+            "# Train Random Forest model\n",
+            "rf_model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+            "rf_model.fit(X_train, y_train)\n",
+            "\n",
+            "# Save model\n",
+            "joblib.dump(rf_model, \"models/threat_detector_rf.pkl\")\n",
+            "print(\"Model saved to models/threat_detector_rf.pkl\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\")\n"
+      ],
+      "metadata": {
+        "id": "jZLlurqjnWPW"
+      },
+      "execution_count": 17,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "cols = [\n",
+        " 'duration','protocol_type','service','flag','src_bytes','dst_bytes','land',\n",
+        " 'wrong_fragment','urgent','hot','num_failed_logins','logged_in','num_compromised',\n",
+        " 'root_shell','su_attempted','num_root','num_file_creations','num_shells',\n",
+        " 'num_access_files','num_outbound_cmds','is_host_login','is_guest_login',\n",
+        " 'count','srv_count','serror_rate','srv_serror_rate','rerror_rate','srv_rerror_rate',\n",
+        " 'same_srv_rate','diff_srv_rate','srv_diff_host_rate','dst_host_count',\n",
+        " 'dst_host_srv_count','dst_host_same_srv_rate','dst_host_diff_srv_rate',\n",
+        " 'dst_host_same_src_port_rate','dst_host_srv_diff_host_rate','dst_host_serror_rate',\n",
+        " 'dst_host_srv_serror_rate','dst_host_rerror_rate','dst_host_srv_rerror_rate',\n",
+        " 'label','difficulty'\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n"
+      ],
+      "metadata": {
+        "id": "YzXGFwhinaih"
+      },
+      "execution_count": 18,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from sklearn.preprocessing import LabelEncoder\n",
+        "\n",
+        "for col in ['protocol_type','service','flag']:\n",
+        "    le = LabelEncoder()\n",
+        "    df[col] = le.fit_transform(df[col])\n"
+      ],
+      "metadata": {
+        "id": "5s_dxVGXncIc"
+      },
+      "execution_count": 19,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "X = df.drop(\"label\", axis=1)\n",
+        "y = df[\"label\"]\n"
+      ],
+      "metadata": {
+        "id": "DYoMpb_vnfjJ"
+      },
+      "execution_count": 20,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,40p' src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "nW2kyommnict",
+        "outputId": "da35d886-c304-4339-a893-e663e34d5d13"
+      },
+      "execution_count": 22,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "from sklearn.model_selection import train_test_split\n",
+            "from sklearn.ensemble import RandomForestClassifier\n",
+            "import joblib\n",
+            "\n",
+            "# Load preprocessed data\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\")\n",
+            "\n",
+            "# Separate features and target\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "y = df[\"label\"]\n",
+            "\n",
+            "# Train-test split\n",
+            "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+            "\n",
+            "# Train Random Forest model\n",
+            "rf_model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+            "rf_model.fit(X_train, y_train)\n",
+            "\n",
+            "# Save model\n",
+            "joblib.dump(rf_model, \"models/threat_detector_rf.pkl\")\n",
+            "print(\"Model saved to models/threat_detector_rf.pkl\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's|df = pd.read_csv(\"data/KDDTrain+Multi.csv\")|cols = [\\\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\\\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\\\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\\\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\\\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\\\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\\\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\\\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\\\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\\\n",
+        " \"label\",\"difficulty\"\\\n",
+        " ]\\n\\ndf = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)|g' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "8whS25Rfnx3Z"
+      },
+      "execution_count": 24,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/header=None, names=cols/a\\\n",
+        "from sklearn.preprocessing import LabelEncoder\\n\\\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\"]:\\n\\\n",
+        "    le = LabelEncoder()\\n\\\n",
+        "    df[col] = le.fit_transform(df[col])\\n' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "LKVWjBotn2TH"
+      },
+      "execution_count": 25,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python - <<EOF\n",
+        "import pandas as pd\n",
+        "\n",
+        "cols = [\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\n",
+        " \"label\",\"difficulty\"\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "print(\"label\" in df.columns)\n",
+        "print(df[[\"label\"]].head())\n",
+        "EOF\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 315
+        },
+        "id": "6zkDvQbEn4pi",
+        "outputId": "f5d70ecc-96cb-4248-a9fe-6dd20cdf47a9"
+      },
+      "execution_count": 26,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "/bin/bash: line 1: warning: here-document at line 1 delimited by end-of-file (wanted `EOF')\n",
+            "True\n",
+            "     label\n",
+            "0   normal\n",
+            "1   normal\n",
+            "2  neptune\n",
+            "3   normal\n",
+            "4   normal\n"
+          ]
+        },
+        {
+          "output_type": "error",
+          "ename": "NameError",
+          "evalue": "name 'EOF' is not defined",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-3097139412.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m     18\u001b[0m \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"label\"\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcolumns\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     19\u001b[0m \u001b[0mprint\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mdf\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"label\"\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mhead\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 20\u001b[0;31m \u001b[0mEOF\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m: name 'EOF' is not defined"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,50p' src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "qy9ZzDTFo2SZ",
+        "outputId": "b6de01d4-358e-4095-8856-53c40f2a4dfc"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "from sklearn.model_selection import train_test_split\n",
+            "from sklearn.ensemble import RandomForestClassifier\n",
+            "import joblib\n",
+            "\n",
+            "# Load preprocessed data\n",
+            "cols = [  \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",  \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",  \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",  \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",  \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",  \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",  \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",  \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",  \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",  \"label\",\"difficulty\"  ]\n",
+            "\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "\n",
+            "# Separate features and target\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "y = df[\"label\"]\n",
+            "\n",
+            "# Train-test split\n",
+            "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+            "\n",
+            "# Train Random Forest model\n",
+            "rf_model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+            "rf_model.fit(X_train, y_train)\n",
+            "\n",
+            "# Save model\n",
+            "joblib.dump(rf_model, \"models/threat_detector_rf.pkl\")\n",
+            "print(\"Model saved to models/threat_detector_rf.pkl\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's|df = pd.read_csv(\"data/KDDTrain+Multi.csv\")|cols = [\\\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\\\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\\\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\\\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\\\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\\\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\\\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\\\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\\\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\\\n",
+        " \"label\",\"difficulty\"\\\n",
+        " ]\\n\\ndf = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)|g' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "Hln2nZMJpEFR"
+      },
+      "execution_count": 28,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/header=None, names=cols/a\\\n",
+        "from sklearn.preprocessing import LabelEncoder\\n\\\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\"]:\\n\\\n",
+        "    le = LabelEncoder()\\n\\\n",
+        "    df[col] = le.fit_transform(df[col])\\n' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "aHqqzUzipHzd"
+      },
+      "execution_count": 29,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KskxtmecpLP2",
+        "outputId": "5b2e7d4f-6458-4137-a05d-7706a98cc48c"
+      },
+      "execution_count": 30,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  File \"/content/cybersecurity-threat-ai-main/src/train.py\", line 11\n",
+            "    for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "IndentationError: unexpected indent\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,40p' src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "k7CzULqapYSn",
+        "outputId": "17a92036-88f5-40cd-c361-f5b769220ab4"
+      },
+      "execution_count": 31,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "from sklearn.model_selection import train_test_split\n",
+            "from sklearn.ensemble import RandomForestClassifier\n",
+            "import joblib\n",
+            "\n",
+            "# Load preprocessed data\n",
+            "cols = [  \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",  \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",  \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",  \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",  \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",  \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",  \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",  \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",  \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",  \"label\",\"difficulty\"  ]\n",
+            "\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "\n",
+            "# Separate features and target\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "y = df[\"label\"]\n",
+            "\n",
+            "# Train-test split\n",
+            "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+            "\n",
+            "# Train Random Forest model\n",
+            "rf_model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+            "rf_model.fit(X_train, y_train)\n",
+            "\n",
+            "# Save model\n",
+            "joblib.dump(rf_model, \"models/threat_detector_rf.pkl\")\n",
+            "print(\"Model saved to models/threat_detector_rf.pkl\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's/^    from sklearn.preprocessing import LabelEncoder/from sklearn.preprocessing import LabelEncoder/' src/train.py\n",
+        "!sed -i 's/^    for col in \\[\"protocol_type\",\"service\",\"flag\"\\]:/for col in [\"protocol_type\",\"service\",\"flag\"]:/g' src/train.py\n",
+        "!sed -i 's/^        le = LabelEncoder()/    le = LabelEncoder()/g' src/train.py\n",
+        "!sed -i 's/^        df\\[col\\] = le.fit_transform\\(df\\[col\\]\\)/    df[col] = le.fit_transform(df[col])/g' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "kRol10XWpZzL"
+      },
+      "execution_count": 32,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,40p' src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "GLyzcwdhpcy8",
+        "outputId": "df3a5e59-6853-4dfd-f9a2-d6788f72b3b6"
+      },
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "from sklearn.model_selection import train_test_split\n",
+            "from sklearn.ensemble import RandomForestClassifier\n",
+            "import joblib\n",
+            "\n",
+            "# Load preprocessed data\n",
+            "cols = [  \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",  \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",  \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",  \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",  \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",  \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",  \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",  \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",  \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",  \"label\",\"difficulty\"  ]\n",
+            "\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "\n",
+            "# Separate features and target\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "y = df[\"label\"]\n",
+            "\n",
+            "# Train-test split\n",
+            "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+            "\n",
+            "# Train Random Forest model\n",
+            "rf_model = RandomForestClassifier(n_estimators=100, random_state=42)\n",
+            "rf_model.fit(X_train, y_train)\n",
+            "\n",
+            "# Save model\n",
+            "joblib.dump(rf_model, \"models/threat_detector_rf.pkl\")\n",
+            "print(\"Model saved to models/threat_detector_rf.pkl\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's/^[[:space:]]*for col in \\[\"protocol_type\", \"service\", \"flag\"\\]:/for col in [\"protocol_type\",\"service\",\"flag\"]:/g' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "k51cnu1Xphrb"
+      },
+      "execution_count": 35,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '1,40{s/^[ \\t]\\+//}' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "G-0iX5pipz_1"
+      },
+      "execution_count": 37,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tptlmCgAqCAq",
+        "outputId": "c37534e3-b8c9-4b90-eee2-5ca4484e1112"
+      },
+      "execution_count": 38,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  File \"/content/cybersecurity-threat-ai-main/src/train.py\", line 12\n",
+            "    le = LabelEncoder()\n",
+            "    ^^\n",
+            "IndentationError: expected an indented block after 'for' statement on line 11\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/for col in \\[\"protocol_type\",\"service\",\"flag\"\\]:/{n;s/^/    /;n;s/^/    /}' src/train.py\n"
+      ],
+      "metadata": {
+        "id": "icDsCNeLqHP8"
+      },
+      "execution_count": 40,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/train.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7EwqPteZqW13",
+        "outputId": "d8ccc69c-9c00-43ed-f5f8-ec273bd7b9e2"
+      },
+      "execution_count": 41,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Model saved to models/threat_detector_rf.pkl\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KvOaHRCFqnr5",
+        "outputId": "fa55d007-04c2-4b28-cbc6-644877147af9"
+      },
+      "execution_count": 42,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Traceback (most recent call last):\n",
+            "  File \"/content/cybersecurity-threat-ai-main/src/predict.py\", line 11, in <module>\n",
+            "    X = df.drop(\"xAttack\", axis=1)\n",
+            "        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/frame.py\", line 5581, in drop\n",
+            "    return super().drop(\n",
+            "           ^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/generic.py\", line 4788, in drop\n",
+            "    obj = obj._drop_axis(labels, axis, level=level, errors=errors)\n",
+            "          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/generic.py\", line 4830, in _drop_axis\n",
+            "    new_axis = axis.drop(labels, errors=errors)\n",
+            "               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/pandas/core/indexes/base.py\", line 7070, in drop\n",
+            "    raise KeyError(f\"{labels[mask].tolist()} not found in axis\")\n",
+            "KeyError: \"['xAttack'] not found in axis\"\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's/xAttack/label/g' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "K9RCg-WxqxBP"
+      },
+      "execution_count": 43,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's|df = pd.read_csv(\"data/KDDTrain+Multi.csv\")|cols = [\\\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\\\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\\\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\\\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\\\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\\\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\\\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\\\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\\\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\\\n",
+        " \"label\",\"difficulty\"\\\n",
+        " ]\\n\\ndf = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)|g' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "Xr4MEM1sqyhH"
+      },
+      "execution_count": 44,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/header=None, names=cols/a\\\n",
+        "from sklearn.preprocessing import LabelEncoder\\n\\\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\"]:\\n\\\n",
+        "    le = LabelEncoder()\\n\\\n",
+        "    df[col] = le.fit_transform(df[col])\\n' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "ncw6PuHDq2yO"
+      },
+      "execution_count": 45,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,40p' src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "k6a4rls_q6H9",
+        "outputId": "10953fd6-b0d5-4ca1-8a49-a4b48eae9101"
+      },
+      "execution_count": 47,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "import joblib\n",
+            "\n",
+            "# Load model\n",
+            "model = joblib.load(\"models/threat_detector_rf.pkl\")\n",
+            "\n",
+            "# Load test data (or any new data)\n",
+            "cols = [  \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",  \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",  \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",  \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",  \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",  \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",  \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",  \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",  \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",  \"label\",\"difficulty\"  ]\n",
+            "\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            " for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "     le = LabelEncoder()\n",
+            "     df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "\n",
+            "# Separate features\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "\n",
+            "# Make prediction\n",
+            "predictions = model.predict(X)\n",
+            "confidences = model.predict_proba(X).max(axis=1)\n",
+            "\n",
+            "# Preview predictions\n",
+            "for i in range(5):\n",
+            "    print(f\"Prediction: {predictions[i]}, Confidence: {confidences[i]:.2f}\")\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '1,40{s/^[ \\t]\\+//}' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "hOTm5f86rHvw"
+      },
+      "execution_count": 49,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "pPA09Ae7rQ4o",
+        "outputId": "58265bc8-93f3-42a8-f742-2eee72557a63"
+      },
+      "execution_count": 50,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "  File \"/content/cybersecurity-threat-ai-main/src/predict.py\", line 13\n",
+            "    le = LabelEncoder()\n",
+            "    ^^\n",
+            "IndentationError: expected an indented block after 'for' statement on line 12\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -n '1,25p' src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "LaEiJAiZrVdE",
+        "outputId": "8cb27e65-6796-49b9-d21b-21c3bdd0af31"
+      },
+      "execution_count": 51,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "import pandas as pd\n",
+            "import joblib\n",
+            "\n",
+            "# Load model\n",
+            "model = joblib.load(\"models/threat_detector_rf.pkl\")\n",
+            "\n",
+            "# Load test data (or any new data)\n",
+            "cols = [  \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",  \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",  \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",  \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",  \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",  \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",  \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",  \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",  \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",  \"label\",\"difficulty\"  ]\n",
+            "\n",
+            "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+            "from sklearn.preprocessing import LabelEncoder\n",
+            "for col in [\"protocol_type\",\"service\",\"flag\"]:\n",
+            "le = LabelEncoder()\n",
+            "df[col] = le.fit_transform(df[col])\n",
+            "\n",
+            "\n",
+            "# Separate features\n",
+            "X = df.drop(\"label\", axis=1)\n",
+            "\n",
+            "# Make prediction\n",
+            "predictions = model.predict(X)\n",
+            "confidences = model.predict_proba(X).max(axis=1)\n",
+            "\n",
+            "# Preview predictions\n",
+            "for i in range(5):\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/for i in range(5):/{n;s/^/    /}' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "Hq5clIbrrfhh"
+      },
+      "execution_count": 54,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "KnQyUZYgrs_M",
+        "outputId": "ce7a02df-83b9-4335-da0b-45ec96f0f0f4"
+      },
+      "execution_count": 55,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Prediction: normal, Confidence: 1.00\n",
+            "Prediction: normal, Confidence: 0.99\n",
+            "Prediction: neptune, Confidence: 1.00\n",
+            "Prediction: normal, Confidence: 1.00\n",
+            "Prediction: normal, Confidence: 1.00\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -O data/KDDTest+.csv https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wFm59xH9r-Kn",
+        "outputId": "830bf9cb-beb1-43e6-a6c2-b8b5f5e8ca67"
+      },
+      "execution_count": 56,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2026-01-25 05:45:51--  https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n",
+            "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.109.133, 185.199.108.133, 185.199.111.133, ...\n",
+            "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 2639177 (2.5M) [text/plain]\n",
+            "Saving to: ‘data/KDDTest+.csv’\n",
+            "\n",
+            "data/KDDTest+.csv   100%[===================>]   2.52M  --.-KB/s    in 0.04s   \n",
+            "\n",
+            "2026-01-25 05:45:52 (58.1 MB/s) - ‘data/KDDTest+.csv’ saved [2639177/2639177]\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.read_csv(\"data/KDDTest+.csv\", header=None, names=cols)\n"
+      ],
+      "metadata": {
+        "id": "0LGolZlrsCNo"
+      },
+      "execution_count": 57,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install tensorflow\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "WXaf4DiEsw0H",
+        "outputId": "6c2f4335-8bd1-4fb3-8e21-2a24950544fb"
+      },
+      "execution_count": 61,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: tensorflow in /usr/local/lib/python3.12/dist-packages (2.19.0)\n",
+            "Requirement already satisfied: absl-py>=1.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.4.0)\n",
+            "Requirement already satisfied: astunparse>=1.6.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.6.3)\n",
+            "Requirement already satisfied: flatbuffers>=24.3.25 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.12.19)\n",
+            "Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,>=0.2.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.7.0)\n",
+            "Requirement already satisfied: google-pasta>=0.1.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.2.0)\n",
+            "Requirement already satisfied: libclang>=13.0.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (18.1.1)\n",
+            "Requirement already satisfied: opt-einsum>=2.3.2 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.4.0)\n",
+            "Requirement already satisfied: packaging in /usr/local/lib/python3.12/dist-packages (from tensorflow) (25.0)\n",
+            "Requirement already satisfied: protobuf!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<6.0.0dev,>=3.20.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (5.29.5)\n",
+            "Requirement already satisfied: requests<3,>=2.21.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.32.4)\n",
+            "Requirement already satisfied: setuptools in /usr/local/lib/python3.12/dist-packages (from tensorflow) (75.2.0)\n",
+            "Requirement already satisfied: six>=1.12.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.17.0)\n",
+            "Requirement already satisfied: termcolor>=1.1.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.3.0)\n",
+            "Requirement already satisfied: typing-extensions>=3.6.6 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (4.15.0)\n",
+            "Requirement already satisfied: wrapt>=1.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.0.1)\n",
+            "Requirement already satisfied: grpcio<2.0,>=1.24.3 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (1.76.0)\n",
+            "Requirement already satisfied: tensorboard~=2.19.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.19.0)\n",
+            "Requirement already satisfied: keras>=3.5.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.10.0)\n",
+            "Requirement already satisfied: numpy<2.2.0,>=1.26.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (2.0.2)\n",
+            "Requirement already satisfied: h5py>=3.11.0 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (3.15.1)\n",
+            "Requirement already satisfied: ml-dtypes<1.0.0,>=0.5.1 in /usr/local/lib/python3.12/dist-packages (from tensorflow) (0.5.4)\n",
+            "Requirement already satisfied: wheel<1.0,>=0.23.0 in /usr/local/lib/python3.12/dist-packages (from astunparse>=1.6.0->tensorflow) (0.45.1)\n",
+            "Requirement already satisfied: rich in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (13.9.4)\n",
+            "Requirement already satisfied: namex in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.1.0)\n",
+            "Requirement already satisfied: optree in /usr/local/lib/python3.12/dist-packages (from keras>=3.5.0->tensorflow) (0.18.0)\n",
+            "Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.4.4)\n",
+            "Requirement already satisfied: idna<4,>=2.5 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (3.11)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2.5.0)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests<3,>=2.21.0->tensorflow) (2026.1.4)\n",
+            "Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.10)\n",
+            "Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (0.7.2)\n",
+            "Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.12/dist-packages (from tensorboard~=2.19.0->tensorflow) (3.1.3)\n",
+            "Requirement already satisfied: MarkupSafe>=2.1.1 in /usr/local/lib/python3.12/dist-packages (from werkzeug>=1.0.1->tensorboard~=2.19.0->tensorflow) (3.0.2)\n",
+            "Requirement already satisfied: markdown-it-py>=2.2.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (4.0.0)\n",
+            "Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /usr/local/lib/python3.12/dist-packages (from rich->keras>=3.5.0->tensorflow) (2.19.2)\n",
+            "Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.12/dist-packages (from markdown-it-py>=2.2.0->rich->keras>=3.5.0->tensorflow) (0.1.2)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/train_dl.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import Dense, Dropout\n",
+        "from tensorflow.keras.utils import to_categorical\n",
+        "\n",
+        "# Column names\n",
+        "cols = [\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\n",
+        " \"label\",\"difficulty\"\n",
+        "]\n",
+        "\n",
+        "# Load data\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "\n",
+        "# Encode categorical\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    le = LabelEncoder()\n",
+        "    df[col] = le.fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "y = df[\"label\"]\n",
+        "\n",
+        "scaler = StandardScaler()\n",
+        "X = scaler.fit_transform(X)\n",
+        "\n",
+        "y = to_categorical(y)\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\n",
+        "\n",
+        "# Build model\n",
+        "model = Sequential([\n",
+        "    Dense(128, activation=\"relu\", input_shape=(X_train.shape[1],)),\n",
+        "    Dropout(0.3),\n",
+        "    Dense(64, activation=\"relu\"),\n",
+        "    Dropout(0.3),\n",
+        "    Dense(y.shape[1], activation=\"softmax\")\n",
+        "])\n",
+        "\n",
+        "model.compile(\n",
+        "    optimizer=\"adam\",\n",
+        "    loss=\"categorical_crossentropy\",\n",
+        "    metrics=[\"accuracy\"]\n",
+        ")\n",
+        "\n",
+        "history = model.fit(\n",
+        "    X_train, y_train,\n",
+        "    validation_data=(X_test, y_test),\n",
+        "    epochs=10,\n",
+        "    batch_size=128,\n",
+        "    verbose=1\n",
+        ")\n",
+        "\n",
+        "model.save(\"models/threat_detector_dl.h5\")\n",
+        "print(\"Deep learning model saved to models/threat_detector_dl.h5\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ewmc1N91szTv",
+        "outputId": "15345108-7dee-4db6-d6cc-4acdcc0dde15"
+      },
+      "execution_count": 62,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/train_dl.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/train_dl.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hrUPTof_s495",
+        "outputId": "0311ee47-6212-4e6c-8ebd-2d27f0eaa696"
+      },
+      "execution_count": 63,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 05:50:04.649453: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769320204.669716   10847 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769320204.675949   10847 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769320204.691788   10847 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320204.691826   10847 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320204.691830   10847 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320204.691930   10847 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 05:50:04.697071: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "/usr/local/lib/python3.12/dist-packages/keras/src/layers/core/dense.py:93: UserWarning: Do not pass an `input_shape`/`input_dim` argument to a layer. When using Sequential models, prefer using an `Input(shape)` object as the first layer in the model instead.\n",
+            "  super().__init__(activity_regularizer=activity_regularizer, **kwargs)\n",
+            "2026-01-25 05:50:10.718672: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769320210.720036   10847 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "Epoch 1/10\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "I0000 00:00:1769320213.351650   10894 service.cc:152] XLA service 0x7c92e8007ee0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+            "I0000 00:00:1769320213.351691   10894 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\n",
+            "2026-01-25 05:50:13.431760: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\n",
+            "I0000 00:00:1769320213.707086   10894 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+            "I0000 00:00:1769320215.776079   10894 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m8s\u001b[0m 6ms/step - accuracy: 0.8739 - loss: 0.5461 - val_accuracy: 0.9905 - val_loss: 0.0386\n",
+            "Epoch 2/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 3ms/step - accuracy: 0.9855 - loss: 0.0559 - val_accuracy: 0.9921 - val_loss: 0.0280\n",
+            "Epoch 3/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 3ms/step - accuracy: 0.9904 - loss: 0.0337 - val_accuracy: 0.9935 - val_loss: 0.0241\n",
+            "Epoch 4/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m3s\u001b[0m 4ms/step - accuracy: 0.9918 - loss: 0.0297 - val_accuracy: 0.9945 - val_loss: 0.0211\n",
+            "Epoch 5/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 2ms/step - accuracy: 0.9934 - loss: 0.0223 - val_accuracy: 0.9946 - val_loss: 0.0193\n",
+            "Epoch 6/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 3ms/step - accuracy: 0.9944 - loss: 0.0194 - val_accuracy: 0.9947 - val_loss: 0.0196\n",
+            "Epoch 7/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 3ms/step - accuracy: 0.9940 - loss: 0.0204 - val_accuracy: 0.9954 - val_loss: 0.0195\n",
+            "Epoch 8/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 3ms/step - accuracy: 0.9945 - loss: 0.0170 - val_accuracy: 0.9950 - val_loss: 0.0207\n",
+            "Epoch 9/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m3s\u001b[0m 4ms/step - accuracy: 0.9948 - loss: 0.0178 - val_accuracy: 0.9957 - val_loss: 0.0177\n",
+            "Epoch 10/10\n",
+            "\u001b[1m788/788\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m4s\u001b[0m 3ms/step - accuracy: 0.9960 - loss: 0.0145 - val_accuracy: 0.9969 - val_loss: 0.0179\n",
+            "WARNING:absl:You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. \n",
+            "Deep learning model saved to models/threat_detector_dl.h5\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/predict_dl.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import load_model\n",
+        "\n",
+        "# Column names\n",
+        "cols = [\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\n",
+        " \"label\",\"difficulty\"\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    le = LabelEncoder()\n",
+        "    df[col] = le.fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "y_true = df[\"label\"]\n",
+        "\n",
+        "scaler = StandardScaler()\n",
+        "X = scaler.fit_transform(X)\n",
+        "\n",
+        "model = load_model(\"models/threat_detector_dl.h5\")\n",
+        "\n",
+        "probs = model.predict(X)\n",
+        "predictions = np.argmax(probs, axis=1)\n",
+        "confidences = probs.max(axis=1)\n",
+        "\n",
+        "for i in range(5):\n",
+        "    print(f\"Prediction: {predictions[i]}, Confidence: {confidences[i]:.2f}\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "h-0t-QEDtfbH",
+        "outputId": "488cb5f9-2bcd-4745-9ed7-dc05186f833b"
+      },
+      "execution_count": 64,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/predict_dl.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict_dl.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "cEJAZjOHtiDS",
+        "outputId": "088fb30a-16a7-4ae3-d4ce-7e9331f29d93"
+      },
+      "execution_count": 65,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 05:52:49.177317: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769320369.196524   11756 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769320369.202418   11756 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769320369.217345   11756 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320369.217369   11756 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320369.217373   11756 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769320369.217376   11756 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 05:52:49.222538: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 05:52:54.782295: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769320374.782471   11756 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "I0000 00:00:1769320376.280922   11802 service.cc:152] XLA service 0x7d1b88005d00 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+            "I0000 00:00:1769320376.280958   11802 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\n",
+            "2026-01-25 05:52:56.286838: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\n",
+            "I0000 00:00:1769320376.308846   11802 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+            "I0000 00:00:1769320376.633439   11802 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n",
+            "\u001b[1m3937/3937\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 1ms/step\n",
+            "Prediction: 11, Confidence: 1.00\n",
+            "Prediction: 11, Confidence: 0.53\n",
+            "Prediction: 9, Confidence: 1.00\n",
+            "Prediction: 11, Confidence: 1.00\n",
+            "Prediction: 11, Confidence: 1.00\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -O data/KDDTest+.csv https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "x6hptpQ6t-vb",
+        "outputId": "e75f68e7-9a81-4cdb-e0f1-5b253a9eff28"
+      },
+      "execution_count": 66,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2026-01-25 05:54:39--  https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n",
+            "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.111.133, 185.199.110.133, 185.199.109.133, ...\n",
+            "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.111.133|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 2639177 (2.5M) [text/plain]\n",
+            "Saving to: ‘data/KDDTest+.csv’\n",
+            "\n",
+            "\rdata/KDDTest+.csv     0%[                    ]       0  --.-KB/s               \rdata/KDDTest+.csv   100%[===================>]   2.52M  --.-KB/s    in 0.04s   \n",
+            "\n",
+            "2026-01-25 05:54:39 (58.2 MB/s) - ‘data/KDDTest+.csv’ saved [2639177/2639177]\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -O data/KDDTest+.csv https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AjNI4tIKuAid",
+        "outputId": "57fd8da3-edca-4024-b788-0300253da374"
+      },
+      "execution_count": 67,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "--2026-01-25 05:54:54--  https://raw.githubusercontent.com/defcom17/NSL_KDD/master/KDDTest+.csv\n",
+            "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.110.133, 185.199.109.133, 185.199.108.133, ...\n",
+            "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.110.133|:443... connected.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 2639177 (2.5M) [text/plain]\n",
+            "Saving to: ‘data/KDDTest+.csv’\n",
+            "\n",
+            "\rdata/KDDTest+.csv     0%[                    ]       0  --.-KB/s               \rdata/KDDTest+.csv   100%[===================>]   2.52M  --.-KB/s    in 0.05s   \n",
+            "\n",
+            "2026-01-25 05:54:54 (51.0 MB/s) - ‘data/KDDTest+.csv’ saved [2639177/2639177]\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/train_lstm.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import LSTM, Dense, Dropout\n",
+        "from tensorflow.keras.utils import to_categorical\n",
+        "\n",
+        "cols = [\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\n",
+        " \"label\",\"difficulty\"\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    df[col] = LabelEncoder().fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "y = df[\"label\"]\n",
+        "\n",
+        "X = StandardScaler().fit_transform(X)\n",
+        "y = to_categorical(y)\n",
+        "\n",
+        "X = X.reshape((X.shape[0], 1, X.shape[1]))\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n",
+        "\n",
+        "model = Sequential([\n",
+        "    LSTM(64, input_shape=(1, X_train.shape[2])),\n",
+        "    Dropout(0.3),\n",
+        "    Dense(y.shape[1], activation=\"softmax\")\n",
+        "])\n",
+        "\n",
+        "model.compile(optimizer=\"adam\", loss=\"categorical_crossentropy\", metrics=[\"accuracy\"])\n",
+        "model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=128)\n",
+        "\n",
+        "model.save(\"models/threat_detector_lstm.keras\")\n",
+        "print(\"LSTM model saved.\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "rSh5pkJ2uIR0",
+        "outputId": "d0fb3f99-3d73-4e54-fa4c-36961c4fb4c5"
+      },
+      "execution_count": 68,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/train_lstm.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/train_cnn.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.model_selection import train_test_split\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import Sequential\n",
+        "from tensorflow.keras.layers import Conv1D, MaxPooling1D, Dense, Flatten, Dropout\n",
+        "from tensorflow.keras.utils import to_categorical\n",
+        "\n",
+        "cols = [...]  # SAME AS ABOVE\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    df[col] = LabelEncoder().fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "y = to_categorical(df[\"label\"])\n",
+        "\n",
+        "X = StandardScaler().fit_transform(X)\n",
+        "X = X.reshape((X.shape[0], X.shape[1], 1))\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)\n",
+        "\n",
+        "model = Sequential([\n",
+        "    Conv1D(64, 3, activation=\"relu\", input_shape=(X_train.shape[1],1)),\n",
+        "    MaxPooling1D(2),\n",
+        "    Flatten(),\n",
+        "    Dense(64, activation=\"relu\"),\n",
+        "    Dropout(0.3),\n",
+        "    Dense(y.shape[1], activation=\"softmax\")\n",
+        "])\n",
+        "\n",
+        "model.compile(optimizer=\"adam\", loss=\"categorical_crossentropy\", metrics=[\"accuracy\"])\n",
+        "model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=10, batch_size=128)\n",
+        "\n",
+        "model.save(\"models/threat_detector_cnn.keras\")\n",
+        "print(\"CNN model saved.\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "tm3EFoezuKyj",
+        "outputId": "22be4b17-2d51-4e6e-a80f-e489cc442b56"
+      },
+      "execution_count": 69,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/train_cnn.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/train_autoencoder.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import Model\n",
+        "from tensorflow.keras.layers import Input, Dense\n",
+        "\n",
+        "cols = [...]  # SAME AS ABOVE\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTrain+Multi.csv\", header=None, names=cols)\n",
+        "\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    df[col] = LabelEncoder().fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "X = StandardScaler().fit_transform(X)\n",
+        "\n",
+        "input_dim = X.shape[1]\n",
+        "input_layer = Input(shape=(input_dim,))\n",
+        "encoded = Dense(64, activation=\"relu\")(input_layer)\n",
+        "decoded = Dense(input_dim, activation=\"linear\")(encoded)\n",
+        "\n",
+        "autoencoder = Model(input_layer, decoded)\n",
+        "autoencoder.compile(optimizer=\"adam\", loss=\"mse\")\n",
+        "autoencoder.fit(X, X, epochs=10, batch_size=128)\n",
+        "\n",
+        "autoencoder.save(\"models/threat_detector_autoencoder.keras\")\n",
+        "print(\"Autoencoder saved.\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yeFrBxIvuP8A",
+        "outputId": "70f2fdda-7bf8-43fd-fd71-75a7980026a8"
+      },
+      "execution_count": 70,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/train_autoencoder.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import joblib\n",
+        "model_path = 'models/threat_detector_rf.pkl'\n",
+        "rf_model = joblib.load(model_path)\n",
+        "\n",
+        "# Assuming df is already loaded with KDDTest+.csv and preprocessed\n",
+        "# If not, you'd need to load and preprocess the test data similarly to how it's done in predict.py\n",
+        "# For now, let's use the 'df' that was loaded from KDDTest+.csv in cell 0LGolZlrsCNo\n",
+        "\n",
+        "# Ensure the same preprocessing steps are applied as in src/train.py\n",
+        "from sklearn.preprocessing import LabelEncoder\n",
+        "\n",
+        "# Make a copy to avoid modifying the original 'df' if it's used elsewhere after this point\n",
+        "test_df = df.copy()\n",
+        "\n",
+        "for col in ['protocol_type','service','flag']:\n",
+        "    le = LabelEncoder()\n",
+        "    # Fit and transform using the test_df itself if you expect new categories, or use existing encoder if available\n",
+        "    # For simplicity, fitting on current test_df. In a real scenario, use encoders fitted on training data.\n",
+        "    test_df[col] = le.fit_transform(test_df[col])\n",
+        "\n",
+        "# Drop only the 'label' column from the test data for prediction, retaining 'difficulty'\n",
+        "X_test_processed = test_df.drop(['label'], axis=1)\n",
+        "\n",
+        "rf_predictions = rf_model.predict(X_test_processed)\n",
+        "print(rf_predictions)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "phAhWTtKuw1c",
+        "outputId": "b11f7bfb-b536-4da2-f0d3-1001546aa6f4"
+      },
+      "execution_count": 74,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "['neptune' 'neptune' 'normal' ... 'back' 'normal' 'neptune']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# RF predictions\n",
+        "rf_predictions = rf_model.predict(X)\n",
+        "\n",
+        "# DL predictions (already exists)\n",
+        "dl_predictions = predictions   # or np.argmax(probs, axis=1)\n",
+        "\n",
+        "from sklearn.metrics import accuracy_score\n",
+        "\n",
+        "print(\"RF Accuracy:\", accuracy_score(y_true, rf_predictions))\n",
+        "print(\"DL Accuracy:\", accuracy_score(y_true, dl_predictions))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 211
+        },
+        "id": "VJQTejfuvQcr",
+        "outputId": "74470c31-8f49-4f15-ef56-1555eab070c6"
+      },
+      "execution_count": 75,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "NameError",
+          "evalue": "name 'predictions' is not defined",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mNameError\u001b[0m                                 Traceback (most recent call last)",
+            "\u001b[0;32m/tmp/ipython-input-3640426818.py\u001b[0m in \u001b[0;36m<cell line: 0>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m# DL predictions (already exists)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 5\u001b[0;31m \u001b[0mdl_predictions\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpredictions\u001b[0m   \u001b[0;31m# or np.argmax(probs, axis=1)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      6\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0msklearn\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mmetrics\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0maccuracy_score\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mNameError\u001b[0m: name 'predictions' is not defined"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/dl_predictions = predictions/i predictions = model.predict(X)' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "h46kgGeRvbeD"
+      },
+      "execution_count": 78,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i '/predictions = model.predict(X)/i from tensorflow.keras.models import load_model\\nmodel = load_model(\"models/threat_detector_dl.h5\")' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "Zluyy3D6vne0"
+      },
+      "execution_count": 82,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "18yI25i3wC9N",
+        "outputId": "43230f1f-c1b2-4238-9a89-fb0f38b49c81"
+      },
+      "execution_count": 83,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 06:03:48.727052: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769321028.743731   14550 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769321028.748613   14550 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769321028.762963   14550 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321028.762989   14550 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321028.762995   14550 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321028.762999   14550 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 06:03:48.767046: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 06:03:53.666175: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769321033.666335   14550 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "I0000 00:00:1769321034.737313   14599 service.cc:152] XLA service 0x7c3cf8004ad0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+            "I0000 00:00:1769321034.737343   14599 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\n",
+            "2026-01-25 06:03:54.743269: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\n",
+            "I0000 00:00:1769321034.765905   14599 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+            "I0000 00:00:1769321035.092635   14599 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n",
+            "\u001b[1m3937/3937\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m6s\u001b[0m 1ms/step\n",
+            "Traceback (most recent call last):\n",
+            "  File \"/content/cybersecurity-threat-ai-main/src/predict.py\", line 24, in <module>\n",
+            "    confidences = model.predict_proba(X).max(axis=1)\n",
+            "                  ^^^^^^^^^^^^^^^^^^^\n",
+            "AttributeError: 'Sequential' object has no attribute 'predict_proba'\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!sed -i 's/model.predict_proba(X)/model.predict(X)/g' src/predict.py\n"
+      ],
+      "metadata": {
+        "id": "TRSAiaC3wU1O"
+      },
+      "execution_count": 84,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/predict.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "BQf9NYiGwXAs",
+        "outputId": "4aea041e-b37a-4b9e-c949-a8cc3ae44cdb"
+      },
+      "execution_count": 85,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 06:05:04.193015: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769321104.209413   14934 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769321104.214213   14934 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769321104.226952   14934 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321104.226978   14934 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321104.226981   14934 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321104.226986   14934 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 06:05:04.232211: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 06:05:09.664322: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769321109.664467   14934 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "I0000 00:00:1769321110.717833   14980 service.cc:152] XLA service 0x7c0908003db0 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+            "I0000 00:00:1769321110.717864   14980 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\n",
+            "2026-01-25 06:05:10.723580: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\n",
+            "I0000 00:00:1769321110.745490   14980 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+            "I0000 00:00:1769321111.064442   14980 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n",
+            "\u001b[1m3937/3937\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 1ms/step\n",
+            "\u001b[1m3937/3937\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m5s\u001b[0m 1ms/step\n",
+            "Prediction: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.], Confidence: 1.00\n",
+            "Prediction: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.], Confidence: 1.00\n",
+            "Prediction: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.], Confidence: 1.00\n",
+            "Prediction: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.], Confidence: 1.00\n",
+            "Prediction: [0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 0. 0. 0. 0. 0. 0. 0.], Confidence: 1.00\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/roc_plot.py\n",
+        "import pandas as pd\n",
+        "import numpy as np\n",
+        "import joblib\n",
+        "import matplotlib.pyplot as plt\n",
+        "from sklearn.metrics import roc_curve, auc\n",
+        "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+        "from tensorflow.keras.models import load_model\n",
+        "\n",
+        "# Column names\n",
+        "cols = [\n",
+        " \"duration\",\"protocol_type\",\"service\",\"flag\",\"src_bytes\",\"dst_bytes\",\"land\",\n",
+        " \"wrong_fragment\",\"urgent\",\"hot\",\"num_failed_logins\",\"logged_in\",\"num_compromised\",\n",
+        " \"root_shell\",\"su_attempted\",\"num_root\",\"num_file_creations\",\"num_shells\",\n",
+        " \"num_access_files\",\"num_outbound_cmds\",\"is_host_login\",\"is_guest_login\",\n",
+        " \"count\",\"srv_count\",\"serror_rate\",\"srv_serror_rate\",\"rerror_rate\",\"srv_rerror_rate\",\n",
+        " \"same_srv_rate\",\"diff_srv_rate\",\"srv_diff_host_rate\",\"dst_host_count\",\n",
+        " \"dst_host_srv_count\",\"dst_host_same_srv_rate\",\"dst_host_diff_srv_rate\",\n",
+        " \"dst_host_same_src_port_rate\",\"dst_host_srv_diff_host_rate\",\"dst_host_serror_rate\",\n",
+        " \"dst_host_srv_serror_rate\",\"dst_host_rerror_rate\",\"dst_host_srv_rerror_rate\",\n",
+        " \"label\",\"difficulty\"\n",
+        "]\n",
+        "\n",
+        "df = pd.read_csv(\"data/KDDTest+.csv\", header=None, names=cols)\n",
+        "\n",
+        "for col in [\"protocol_type\",\"service\",\"flag\",\"label\"]:\n",
+        "    df[col] = LabelEncoder().fit_transform(df[col])\n",
+        "\n",
+        "X = df.drop(\"label\", axis=1)\n",
+        "y_true = df[\"label\"]\n",
+        "\n",
+        "scaler = StandardScaler()\n",
+        "X = scaler.fit_transform(X)\n",
+        "\n",
+        "rf_model = joblib.load(\"models/threat_detector_rf.pkl\")\n",
+        "dl_model = load_model(\"models/threat_detector_dl.h5\")\n",
+        "\n",
+        "rf_probs = rf_model.predict_proba(X)\n",
+        "dl_probs = dl_model.predict(X)\n",
+        "\n",
+        "fpr_rf, tpr_rf, _ = roc_curve(y_true, rf_probs[:,1], pos_label=1)\n",
+        "fpr_dl, tpr_dl, _ = roc_curve(y_true, dl_probs[:,1], pos_label=1)\n",
+        "\n",
+        "auc_rf = auc(fpr_rf, tpr_rf)\n",
+        "auc_dl = auc(fpr_dl, tpr_dl)\n",
+        "\n",
+        "plt.figure()\n",
+        "plt.plot(fpr_rf, tpr_rf, label=f\"RF (AUC={auc_rf:.3f})\")\n",
+        "plt.plot(fpr_dl, tpr_dl, label=f\"DL (AUC={auc_dl:.3f})\")\n",
+        "plt.plot([0,1],[0,1],\"--\")\n",
+        "plt.xlabel(\"False Positive Rate\")\n",
+        "plt.ylabel(\"True Positive Rate\")\n",
+        "plt.title(\"ROC Curve: RF vs DL\")\n",
+        "plt.legend()\n",
+        "plt.show()\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "n1yfdb14xCmc",
+        "outputId": "889ee9c1-471d-4d57-daac-2cf2e8699b1b"
+      },
+      "execution_count": 86,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/roc_plot.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/roc_plot.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ho0aMS13xF9e",
+        "outputId": "41eb67fe-897a-404c-b7d7-39a561f2e8cf"
+      },
+      "execution_count": 87,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 06:08:17.048360: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769321297.067871   15797 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769321297.073878   15797 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769321297.088767   15797 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321297.088795   15797 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321297.088799   15797 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321297.088804   15797 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 06:08:17.093235: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 06:08:21.664003: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769321301.664160   15797 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            "/usr/local/lib/python3.12/dist-packages/sklearn/utils/validation.py:2739: UserWarning: X does not have valid feature names, but RandomForestClassifier was fitted with feature names\n",
+            "  warnings.warn(\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "I0000 00:00:1769321303.205667   15840 service.cc:152] XLA service 0x7a70a8005060 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:\n",
+            "I0000 00:00:1769321303.205704   15840 service.cc:160]   StreamExecutor device (0): Tesla T4, Compute Capability 7.5\n",
+            "2026-01-25 06:08:23.214143: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.\n",
+            "I0000 00:00:1769321303.243422   15840 cuda_dnn.cc:529] Loaded cuDNN version 91002\n",
+            "I0000 00:00:1769321303.675436   15840 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.\n",
+            "\u001b[1m705/705\u001b[0m \u001b[32m━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[37m\u001b[0m \u001b[1m2s\u001b[0m 2ms/step\n",
+            "Figure(640x480)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile src/api.py\n",
+        "from flask import Flask, request, jsonify\n",
+        "import joblib\n",
+        "import numpy as np\n",
+        "from tensorflow.keras.models import load_model\n",
+        "\n",
+        "rf_model = joblib.load(\"models/threat_detector_rf.pkl\")\n",
+        "dl_model = load_model(\"models/threat_detector_dl.h5\")\n",
+        "\n",
+        "app = Flask(__name__)\n",
+        "\n",
+        "@app.route(\"/predict\", methods=[\"POST\"])\n",
+        "def predict():\n",
+        "    data = np.array(request.json[\"features\"]).reshape(1, -1)\n",
+        "    rf_pred = rf_model.predict(data)[0]\n",
+        "    dl_probs = dl_model.predict(data)\n",
+        "    dl_pred = int(np.argmax(dl_probs))\n",
+        "\n",
+        "    return jsonify({\n",
+        "        \"rf_prediction\": str(rf_pred),\n",
+        "        \"dl_prediction\": str(dl_pred),\n",
+        "        \"dl_confidence\": float(dl_probs.max())\n",
+        "    })\n",
+        "\n",
+        "app.run(host=\"0.0.0.0\", port=5000)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "QVnDvlx7xcxm",
+        "outputId": "669200d5-5020-454e-e2f1-ecfadc8fda9c"
+      },
+      "execution_count": 88,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing src/api.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/api.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gtfIJqwpxeLQ",
+        "outputId": "c3dac810-0bba-4ad6-86ec-ce334360d652"
+      },
+      "execution_count": 90,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 06:12:49.283736: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769321569.303495   17034 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769321569.309693   17034 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769321569.324688   17034 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321569.324713   17034 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321569.324717   17034 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769321569.324720   17034 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 06:12:49.329203: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 06:12:56.682448: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769321576.685477   17034 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            " * Serving Flask app 'api'\n",
+            " * Debug mode: off\n",
+            "INFO:werkzeug:\u001b[31m\u001b[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\u001b[0m\n",
+            " * Running on all addresses (0.0.0.0)\n",
+            " * Running on http://127.0.0.1:5000\n",
+            " * Running on http://172.28.0.12:5000\n",
+            "INFO:werkzeug:\u001b[33mPress CTRL+C to quit\u001b[0m\n",
+            "Exception ignored in atexit callback: <function clean_up at 0x7d37d1d3cb80>\n",
+            "Traceback (most recent call last):\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/jax/_src/api.py\", line 3173, in clean_up\n",
+            "    clear_caches()\n",
+            "  File \"/usr/local/lib/python3.12/dist-packages/jax/_src/api.py\", line 3196, in clear_caches\n",
+            "    pjit._cpp_pjit_cache_explicit_attributes.clear()\n",
+            "KeyboardInterrupt: \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install pyngrok\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "dDhWioEHyvNa",
+        "outputId": "2decb0ab-4536-4c62-a5df-60ef1821e791"
+      },
+      "execution_count": 92,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting pyngrok\n",
+            "  Downloading pyngrok-7.5.0-py3-none-any.whl.metadata (8.1 kB)\n",
+            "Requirement already satisfied: PyYAML>=5.1 in /usr/local/lib/python3.12/dist-packages (from pyngrok) (6.0.3)\n",
+            "Downloading pyngrok-7.5.0-py3-none-any.whl (24 kB)\n",
+            "Installing collected packages: pyngrok\n",
+            "Successfully installed pyngrok-7.5.0\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyngrok import ngrok\n",
+        "\n",
+        "ngrok.set_auth_token(\"38jnPbWXZ3ORZg67Puq91ohsEj5_7PF2NU2c7k7xRwm6BgZex\")\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "YHoiTVI5zONC",
+        "outputId": "7a5ac6b2-3da5-4469-9861-a0e2e1e30a31"
+      },
+      "execution_count": 93,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": []
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyngrok import ngrok\n",
+        "\n",
+        "public_url = ngrok.connect(5000)\n",
+        "print(\"Public API URL:\", public_url)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vze0DQePzTK_",
+        "outputId": "80d5ace1-3105-4710-dd29-501ff80075ff"
+      },
+      "execution_count": 94,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Public API URL: NgrokTunnel: \"https://micrographic-epigraphic-kortney.ngrok-free.dev\" -> \"http://localhost:5000\"\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!python src/api.py\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hlla6eORzb80",
+        "outputId": "3c1404b5-f5c8-4a7d-d542-23be31969cdd"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "2026-01-25 06:20:05.319677: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered\n",
+            "WARNING: All log messages before absl::InitializeLog() is called are written to STDERR\n",
+            "E0000 00:00:1769322005.381772   18929 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered\n",
+            "E0000 00:00:1769322005.391865   18929 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered\n",
+            "W0000 00:00:1769322005.418873   18929 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769322005.419325   18929 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769322005.419352   18929 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "W0000 00:00:1769322005.419359   18929 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.\n",
+            "2026-01-25 06:20:05.433295: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.\n",
+            "To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.\n",
+            "2026-01-25 06:20:11.661281: W tensorflow/core/common_runtime/gpu/gpu_bfc_allocator.cc:47] Overriding orig_value setting because the TF_FORCE_GPU_ALLOW_GROWTH environment variable is set. Original config value was 0.\n",
+            "I0000 00:00:1769322011.661431   18929 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 13942 MB memory:  -> device: 0, name: Tesla T4, pci bus id: 0000:00:04.0, compute capability: 7.5\n",
+            "WARNING:absl:Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.\n",
+            " * Serving Flask app 'api'\n",
+            " * Debug mode: off\n",
+            "INFO:werkzeug:\u001b[31m\u001b[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.\u001b[0m\n",
+            " * Running on all addresses (0.0.0.0)\n",
+            " * Running on http://127.0.0.1:5000\n",
+            " * Running on http://172.28.0.12:5000\n",
+            "INFO:werkzeug:\u001b[33mPress CTRL+C to quit\u001b[0m\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyngrok import ngrok\n",
+        "\n",
+        "ngrok.kill()   # clean old tunnels\n",
+        "public_url = ngrok.connect(5000)\n",
+        "print(\"Public API URL:\", public_url)\n"
+      ],
+      "metadata": {
+        "id": "zpbE_bsEz6Eq"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
