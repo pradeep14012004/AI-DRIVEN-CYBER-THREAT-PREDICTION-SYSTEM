@@ -110,3 +110,15 @@ This project explores the combination of **temporal deep learning and anomaly de
 ## License
 
 See the repository license for usage terms.
+
+
+## Live Demo / Deployment
+
+A lightweight FastAPI browser demo is included in `api/` and can be deployed with the root `Dockerfile`.
+
+```bash
+docker build -t cyber-threat-demo .
+docker run -p 8000:8000 cyber-threat-demo
+```
+
+Open `http://localhost:8000`. The hosted demo uses an explainable screening fallback when trained model artifacts are unavailable; it does not claim the reported 98.6% research result.
