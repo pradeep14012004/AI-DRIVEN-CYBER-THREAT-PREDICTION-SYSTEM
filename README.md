@@ -14,6 +14,24 @@ The project combines a **Bi-LSTM**, **Deep Autoencoder**, and a **weighted ensem
 - Hybrid sequence modelling + unsupervised anomaly detection
 - Weighted ensemble for final threat prediction
 
+## Evaluation transparency and reproducibility
+
+The values above (98.6% accuracy and 0.981 AUC) are project-reported experimental results. They should be treated as reported results, not independently reproduced by reading this README alone.
+
+For a reproducible research result, publish the following alongside the metrics:
+
+- Exact train, validation, and test split strategy (including whether the split is chronological, stratified, or grouped by flow/day).
+- Dataset version/source, selected CICIDS-2017 files, class mapping, and preprocessing steps.
+- Feature list, handling of missing/infinite values, normalization fit scope, and any class-balancing procedure.
+- Sequence-window length, Bi-LSTM and autoencoder layer sizes, loss functions, optimizer, learning rate, batch size, epochs, and random seeds.
+- Weighted-ensemble formula and the method used to select its weights and decision threshold.
+- Confusion matrix, per-class precision/recall/F1, macro and weighted averages, ROC-AUC definition, and evaluation script.
+- Environment versions and exact commands needed to regenerate the reported tables and plots.
+
+**Data-leakage check:** Fit preprocessing transforms and select thresholds/ensemble weights using training/validation data only. Keep the test set untouched until final evaluation. If multiple flows originate from the same capture/day, document how related records are kept from crossing splits.
+
+Until these details and a clean rerun are committed, do not describe the headline metrics as independently verified or production performance.
+
 ## Architecture
 
 ```text
